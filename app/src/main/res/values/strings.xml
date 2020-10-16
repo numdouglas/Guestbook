@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Guestbook</string>
+    <string name="address">Address :</string>
+    <string name="phone">Phone :</string>
+    <string name="email">Email :</string>
+    <string name="comment">Comment :</string>
+    <string name="delete">DELETE</string>
+</resources>

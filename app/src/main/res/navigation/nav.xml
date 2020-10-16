@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav"
+    app:startDestination="@id/homeScreenFragment">
+
+    <fragment
+        android:id="@+id/homeScreenFragment"
+        android:name="com.example.guestbook.HomeScreenFragment"
+        android:label="HomeScreenFragment"
+        tools:layout="@layout/home_screen">
+        <action
+            android:id="@+id/action_homeScreenFragment_to_addGuestFragment"
+            app:destination="@id/addGuestFragment" />
+        <action
+            android:id="@+id/action_homeScreenFragment_to_guestDetailFragment"
+            app:destination="@id/guestDetailFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/addGuestFragment"
+        android:name="com.example.guestbook.AddGuestFragment"
+        android:label="AddGuestFragment"
+        tools:layout="@layout/add_guest">
+        <action
+            android:id="@+id/action_addGuestFragment_to_homeScreenFragment"
+            app:destination="@id/homeScreenFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/guestDetailFragment"
+        android:name="com.example.guestbook.GuestDetailFragment"
+        tools:layout="@layout/guest_detail"
+        android:label="GuestDetailFragment" >
+
+        <argument
+            android:name="name"
+            app:argType="string" />
+        <argument
+            android:name="address"
+            app:argType="string" />
+        <argument
+            android:name="phone"
+            app:argType="integer" />
+        <argument
+            android:name="email"
+            app:argType="string" />
+        <argument
+            android:name="comment"
+            app:argType="string" />
+    </fragment>
+</navigation>
