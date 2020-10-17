@@ -3,20 +3,27 @@ package com.example.guestbook
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.net.toUri
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.example.guestbook.data.Guest
 import com.example.guestbook.data.GuestDao
 import com.example.guestbook.data.GuestRepo
 import com.example.guestbook.databinding.AddGuestBinding
+import com.google.android.material.snackbar.Snackbar
+import kotlinx.android.synthetic.main.add_guest.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -26,7 +33,7 @@ class AddGuestFragment : Fragment() {
     private lateinit var guestDao: GuestDao
     private lateinit var viewModel: MainsViewModel
     private lateinit var binding:AddGuestBinding
-    private var imgPathData:Uri?=null
+    private var imgPathData:String=""
 
 
     override fun onAttach(context: Context) {
@@ -49,26 +56,28 @@ class AddGuestFragment : Fragment() {
         binding = DataBindingUtil.inflate<AddGuestBinding>(inflater,
             R.layout.add_guest,container,false)
 
-        binding.imageView.setOnClickListener{
+        binding.addGuestImage.setOnClickListener{
             chooseImage()
         }
 
         binding.submitButton.setOnClickListener{
-            addGuestScope.launch {
-                val name=binding.name.text.toString()
-                val address=binding.address.text.toString()
-                val email=binding.email.text.toString()
-                val phone=binding.phone.text.toString().toInt()
-                val comment=binding.comment.text.toString()
 
-                guestDao.insertAll(Guest(name,address,phone,email,comment,""))
+                val name=binding.newName.text.toString()
+                val address=binding.newAddress.text.toString()
+                val email=binding.newMail.text.toString()
+                val phone:Int=binding.newPhone.text.toString().toIntOrNull()?:0
+                val comment=binding.newComment.text.toString()
+
+                if(name.isNotEmpty()&&address.isNotEmpty()&&email.isNotEmpty()
+                        &&comment.isNotEmpty()){
+                    addGuestScope.launch {
+                guestDao.insertAll(Guest(name,address,phone,email,comment,imgPathData))
 
                 val allguests=guestDao.getAll()
-                viewModel.guests?.postValue(allguests)
-            }
-
-            findNavController().popBackStack()
-
+                viewModel.guests?.postValue(allguests)}
+                    findNavController().popBackStack()
+                }else{
+                Snackbar.make(it,"Please fill in all the text fields to proceed.",1400).show() }
         }
         return binding.root
     }
@@ -79,11 +88,37 @@ class AddGuestFragment : Fragment() {
         startActivityForResult(intent,1)
     }
 
+    fun uriToAbs(uri:Uri):String?{
+        val filePath: String?
+        val _uri = uri
+        Log.d("", "URI = $_uri")
+        val cursor: Cursor? = this.context?.contentResolver
+                ?.query(_uri, arrayOf(MediaStore.Images.ImageColumns.DATA), null, null, null)
+        cursor?.moveToFirst()
+        filePath = cursor?.getString(0)
+        cursor?.close()
+        return  filePath
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK && requestCode == 1){
-            binding.imageView.setImageURI(data?.data)
-            imgPathData=data?.data
+
+//            binding.imageView.setImageURI(data?.data)
+
+
+           // imgPathData=data!!.data!!.path!!.split(":")[1]
+
+//            Picasso.get().load( Uri.parse("file://" + uriToAbs(data!!.data!!))) // Add this
+//                    .config(Bitmap.Config.RGB_565)
+//
+//                    .into(add_guest_image)
+
+            Glide.with(this).load(data?.data)
+                    .apply(RequestOptions.centerCropTransform()).into(add_guest_image)
+
+            imgPathData=data?.data.toString()
+            Log.i("URLll",("file://"+uriToAbs(data!!.data!!)).toUri().toString())
         }
     }
 }
