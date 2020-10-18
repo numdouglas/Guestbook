@@ -12,7 +12,7 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         lateinit var viewModel: MainsViewModel
-        val DELAY=4000
+        val DELAY = 4000
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -20,12 +20,12 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         viewModel =
-            ViewModelProvider
-                    .AndroidViewModelFactory
-                    .getInstance(this.application)
-                    .create(MainsViewModel::class.java)
+                ViewModelProvider
+                        .AndroidViewModelFactory
+                        .getInstance(this.application)
+                        .create(MainsViewModel::class.java)
 
-        val listener:PermissionListener=DialogOnDeniedPermissionListener.Builder
+        val listener: PermissionListener = DialogOnDeniedPermissionListener.Builder
                 .withContext(this)
                 .withTitle("Read Files Permission")
                 .withMessage("Read External Storage Permission Needed")
@@ -38,7 +38,6 @@ class MainActivity : AppCompatActivity() {
                 .check()
 
         setContentView(R.layout.activity_main)
-
 
 
     }

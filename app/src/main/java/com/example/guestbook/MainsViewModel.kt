@@ -9,18 +9,18 @@ import com.example.guestbook.data.GuestRepo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class MainsViewModel (application: Application) : AndroidViewModel(application)
-{
-    var guests:MutableLiveData<List<Guest>>?= MutableLiveData()
-    
+class MainsViewModel(application: Application) : AndroidViewModel(application) {
+    var guests: MutableLiveData<List<Guest>>? = MutableLiveData()
+
     init {
         updateGuests(application)
     }
 
-    fun updateGuests(application: Application){
-      viewModelScope.launch(Dispatchers.IO) {
-          val guestDao= GuestRepo.getDatabase(application.applicationContext).guestDao()
+    fun updateGuests(application: Application) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val guestDao = GuestRepo.getDatabase(application.applicationContext).guestDao()
 
-          guests?.postValue(guestDao.getAll()) }
+            guests?.postValue(guestDao.getAll())
+        }
     }
 }

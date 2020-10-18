@@ -22,7 +22,7 @@ import kotlinx.android.synthetic.main.home_screen.recycler
 import androidx.core.app.ActivityCompat.recreate
 
 class HomeScreenFragment : Fragment() {
-    private lateinit var binding:HomeScreenBinding
+    private lateinit var binding: HomeScreenBinding
     private lateinit var mainsAdapter: MainsAdapter
     private lateinit var viewModel: MainsViewModel
 
@@ -30,28 +30,28 @@ class HomeScreenFragment : Fragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        guestDao= GuestRepo.getDatabase(context).guestDao()
+        guestDao = GuestRepo.getDatabase(context).guestDao()
     }
 
     override fun onAttach(activity: Activity) {
         super.onAttach(activity)
-        viewModel=MainActivity.viewModel
+        viewModel = MainActivity.viewModel
     }
 
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater, container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View? {
 
         binding = DataBindingUtil.inflate<HomeScreenBinding>(inflater,
-            R.layout.home_screen,container,false)
+                R.layout.home_screen, container, false)
 
         binding.addNewButton.setOnClickListener {
 
             findNavController().navigate(HomeScreenFragmentDirections.actionHomeScreenFragmentToAddGuestFragment())
         }
-        viewModel.guests?.observe(viewLifecycleOwner, {guestList->
+        viewModel.guests?.observe(viewLifecycleOwner, { guestList ->
             mainsAdapter.insertItem(guestList)
             mainsAdapter.updateItem(guestList)
 
@@ -68,7 +68,7 @@ class HomeScreenFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        recycler.adapter=null
+        recycler.adapter = null
     }
 
 

@@ -23,15 +23,15 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class GuestDetailFragment:Fragment() {
-    private val guestDetailScope= CoroutineScope(Dispatchers.IO)
+class GuestDetailFragment : Fragment() {
+    private val guestDetailScope = CoroutineScope(Dispatchers.IO)
     private lateinit var guestDao: GuestDao
-    private lateinit var viewModel:MainsViewModel
+    private lateinit var viewModel: MainsViewModel
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        guestDao= GuestRepo.getDatabase(context).guestDao()
-        viewModel=MainActivity.viewModel
+        guestDao = GuestRepo.getDatabase(context).guestDao()
+        viewModel = MainActivity.viewModel
     }
 
 
@@ -39,35 +39,38 @@ class GuestDetailFragment:Fragment() {
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?
     ): View? {
-        val argumentsGiven= arguments?.let { GuestDetailFragmentArgs.fromBundle(it) }
+        val argumentsGiven = arguments?.let { GuestDetailFragmentArgs.fromBundle(it) }
 
         val binding = DataBindingUtil.inflate<GuestDetailBinding>(inflater,
-                R.layout.guest_detail,container,false)
+                R.layout.guest_detail, container, false)
 
-        binding.name.text=argumentsGiven?.name
-        binding.addressDetail.text=argumentsGiven?.address
-        binding.phoneDetail.text=argumentsGiven?.phone.toString()
-        binding.emailDetail.text=argumentsGiven?.email
-        binding.commentDetail.text=argumentsGiven?.comment
+        binding.name.text = argumentsGiven?.name
+        binding.addressDetail.text = argumentsGiven?.address
+        binding.phoneDetail.text = argumentsGiven?.phone.toString()
+        binding.emailDetail.text = argumentsGiven?.email
+        binding.commentDetail.text = argumentsGiven?.comment
         Glide.with(this).load(argumentsGiven?.imgUrl?.toUri())
-                .transform(CenterCrop(),RoundedCorners(2))
+                .transform(CenterCrop(), RoundedCorners(2))
                 .into(binding.pictureDetail)
 
 
 
         binding.deleteButton.setOnClickListener {
-            try{
-            guestDetailScope.launch {
+            try {
+                guestDetailScope.launch {
 
-                guestDao.deleteByPhoneNumber(argumentsGiven!!.phone)
+                    guestDao.deleteByPhoneNumber(argumentsGiven!!.phone)
 
-                this@GuestDetailFragment.activity?.application?.let { it1 -> viewModel.updateGuests(it1) }
+                    this@GuestDetailFragment.activity?.application?.let { it1 -> viewModel.updateGuests(it1) }
+                }
+                Snackbar.make(it, "User '${argumentsGiven?.name}' successfully deleted.", MainActivity.DELAY).show()
+            } catch (e: Exception) {
+                Snackbar.make(it, "Error deleting the user '${argumentsGiven?.name}'.", MainActivity.DELAY).show()
             }
-                Snackbar.make(it,"User '${argumentsGiven?.name}' successfully deleted.",MainActivity.DELAY).show()}
-            catch (e:Exception){Snackbar.make(it,"Error deleting the user '${argumentsGiven?.name}'.",MainActivity.DELAY).show()}
             findNavController().popBackStack()
         }
 
 
-        return binding.root}
+        return binding.root
+    }
 }

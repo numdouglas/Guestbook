@@ -29,64 +29,67 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class AddGuestFragment : Fragment() {
-    private val addGuestScope= CoroutineScope(Dispatchers.IO)
+    private val addGuestScope = CoroutineScope(Dispatchers.IO)
     private lateinit var guestDao: GuestDao
-    private lateinit var viewModel:MainsViewModel
-    private lateinit var binding:AddGuestBinding
-    private var imgPathData:String=""
+    private lateinit var viewModel: MainsViewModel
+    private lateinit var binding: AddGuestBinding
+    private var imgPathData: String = ""
 
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        guestDao= GuestRepo.getDatabase(context).guestDao()
-        viewModel=MainActivity.viewModel
+        guestDao = GuestRepo.getDatabase(context).guestDao()
+        viewModel = MainActivity.viewModel
     }
 
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater, container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View? {
         binding = DataBindingUtil.inflate<AddGuestBinding>(inflater,
-            R.layout.add_guest,container,false)
+                R.layout.add_guest, container, false)
 
-        binding.addGuestImage.setOnClickListener{
+        binding.addGuestImage.setOnClickListener {
             chooseImage()
         }
 
-        binding.submitButton.setOnClickListener{
+        binding.submitButton.setOnClickListener {
 
-                val name=binding.newName.text.toString()
-                val address=binding.newAddress.text.toString()
-                val email=binding.newMail.text.toString()
-                val phone:Long=binding.newPhone.text.toString().toLongOrNull()?:0
-                val comment=binding.newComment.text.toString()
+            val name = binding.newName.text.toString()
+            val address = binding.newAddress.text.toString()
+            val email = binding.newMail.text.toString()
+            val phone: Long = binding.newPhone.text.toString().toLongOrNull() ?: 0
+            val comment = binding.newComment.text.toString()
 
-                if(name.isNotEmpty()&&address.isNotEmpty()&&email.isNotEmpty()
-                        &&comment.isNotEmpty()){
-                   try{
+            if (name.isNotEmpty() && address.isNotEmpty() && email.isNotEmpty()
+                    && comment.isNotEmpty()) {
+                try {
                     addGuestScope.launch {
-                        guestDao.insert(Guest(name,address,phone,email,comment,imgPathData))
+                        guestDao.insert(Guest(name, address, phone, email, comment, imgPathData))
 
                         this@AddGuestFragment.activity?.application
                                 ?.let { it1 -> viewModel.updateGuests(it1) }
-                    }}
-                       catch(e:Exception){Snackbar.make(it,"Failed to insert user '$name'.",MainActivity.DELAY).show()}
-                    findNavController().popBackStack()
-                    Snackbar.make(it,"User '$name' successfully added.",MainActivity.DELAY).show()
-                }else{
-                Snackbar.make(it,"Please fill in all the text fields to proceed.",MainActivity.DELAY).show() }
+                    }
+                } catch (e: Exception) {
+                    Snackbar.make(it, "Failed to insert user '$name'.", MainActivity.DELAY).show()
+                }
+                findNavController().popBackStack()
+                Snackbar.make(it, "User '$name' successfully added.", MainActivity.DELAY).show()
+            } else {
+                Snackbar.make(it, "Please fill in all the text fields to proceed.", MainActivity.DELAY).show()
+            }
         }
         return binding.root
     }
 
-    private fun chooseImage(){
-        val intent=Intent(Intent.ACTION_PICK)
-        intent.type="image/*"
-        startActivityForResult(intent,1)
+    private fun chooseImage() {
+        val intent = Intent(Intent.ACTION_PICK)
+        intent.type = "image/*"
+        startActivityForResult(intent, 1)
     }
 
-    fun uriToAbs(uri:Uri):String?{
+    fun uriToAbs(uri: Uri): String? {
         val filePath: String?
         val _uri = uri
         Log.d("", "URI = $_uri")
@@ -95,17 +98,17 @@ class AddGuestFragment : Fragment() {
         cursor?.moveToFirst()
         filePath = cursor?.getString(0)
         cursor?.close()
-        return  filePath
+        return filePath
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == Activity.RESULT_OK && requestCode == 1){
+        if (resultCode == Activity.RESULT_OK && requestCode == 1) {
             Glide.with(this).load(data?.data)
                     .transform(CenterCrop(), RoundedCorners(14))
                     .into(add_guest_image)
 
-            imgPathData=data?.data.toString()
+            imgPathData = data?.data.toString()
         }
     }
 }
