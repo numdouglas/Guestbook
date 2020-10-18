@@ -17,11 +17,10 @@ class MainsViewModel (application: Application) : AndroidViewModel(application)
         updateGuests(application)
     }
 
-    private fun updateGuests(application: Application){
+    fun updateGuests(application: Application){
       viewModelScope.launch(Dispatchers.IO) {
           val guestDao= GuestRepo.getDatabase(application.applicationContext).guestDao()
 
           guests?.postValue(guestDao.getAll()) }
     }
-
 }

@@ -22,7 +22,7 @@ interface GuestDao{
 
     @Transaction
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertAll(vararg guests:Guest)
+    fun insert(guest:Guest):Long
 
     @Query("delete from Guest")
     fun deleteAll()
@@ -31,7 +31,7 @@ interface GuestDao{
     fun delete(guest:Guest)
 
     @Query("delete from Guest where phone = :phoneNo ")
-    fun deleteByPhoneNumber(phoneNo:Int)
+    fun deleteByPhoneNumber(phoneNo:Int):Int
 
 }
 
@@ -47,9 +47,7 @@ abstract class GuestRepo:RoomDatabase(){
         fun getDatabase(context: Context):GuestRepo{
             val tempInstance= INSTANCE
 
-            if(tempInstance != null){
-                return tempInstance
-            }
+            tempInstance.let {tempInstance}
 
             synchronized(this){
                 val instance=Room.databaseBuilder(

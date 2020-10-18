@@ -14,10 +14,10 @@ import android.view.ViewGroup
 import androidx.core.net.toUri
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
-import com.bumptech.glide.request.RequestOptions
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.guestbook.data.Guest
 import com.example.guestbook.data.GuestDao
 import com.example.guestbook.data.GuestRepo
@@ -31,7 +31,7 @@ import kotlinx.coroutines.launch
 class AddGuestFragment : Fragment() {
     private val addGuestScope= CoroutineScope(Dispatchers.IO)
     private lateinit var guestDao: GuestDao
-    private lateinit var viewModel: MainsViewModel
+    private lateinit var viewModel:MainsViewModel
     private lateinit var binding:AddGuestBinding
     private var imgPathData:String=""
 
@@ -39,15 +39,9 @@ class AddGuestFragment : Fragment() {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         guestDao= GuestRepo.getDatabase(context).guestDao()
+        viewModel=MainActivity.viewModel
     }
 
-    override fun onAttach(activity: Activity) {
-        super.onAttach(activity)
-        viewModel = ViewModelProvider
-                .AndroidViewModelFactory
-                .getInstance(activity.application)
-                .create(MainsViewModel::class.java)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -70,14 +64,18 @@ class AddGuestFragment : Fragment() {
 
                 if(name.isNotEmpty()&&address.isNotEmpty()&&email.isNotEmpty()
                         &&comment.isNotEmpty()){
+                   try{
                     addGuestScope.launch {
-                guestDao.insertAll(Guest(name,address,phone,email,comment,imgPathData))
+                        guestDao.insert(Guest(name,address,phone,email,comment,imgPathData))
 
-                val allguests=guestDao.getAll()
-                viewModel.guests?.postValue(allguests)}
+                        this@AddGuestFragment.activity?.application
+                                ?.let { it1 -> viewModel.updateGuests(it1) }
+                    }}
+                       catch(e:Exception){Snackbar.make(it,"Failed to insert user '$name'.",MainActivity.DELAY).show()}
                     findNavController().popBackStack()
+                    Snackbar.make(it,"User $name successfully added.",MainActivity.DELAY).show()
                 }else{
-                Snackbar.make(it,"Please fill in all the text fields to proceed.",1400).show() }
+                Snackbar.make(it,"Please fill in all the text fields to proceed.",MainActivity.DELAY).show() }
         }
         return binding.root
     }
@@ -103,22 +101,11 @@ class AddGuestFragment : Fragment() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK && requestCode == 1){
-
-//            binding.imageView.setImageURI(data?.data)
-
-
-           // imgPathData=data!!.data!!.path!!.split(":")[1]
-
-//            Picasso.get().load( Uri.parse("file://" + uriToAbs(data!!.data!!))) // Add this
-//                    .config(Bitmap.Config.RGB_565)
-//
-//                    .into(add_guest_image)
-
             Glide.with(this).load(data?.data)
-                    .apply(RequestOptions.centerCropTransform()).into(add_guest_image)
+                    .transform(CenterCrop(), RoundedCorners(14))
+                    .into(add_guest_image)
 
             imgPathData=data?.data.toString()
-            Log.i("URLll",("file://"+uriToAbs(data!!.data!!)).toUri().toString())
         }
     }
 }

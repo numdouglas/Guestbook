@@ -47,5 +47,8 @@
         <argument
             android:name="comment"
             app:argType="string" />
+        <argument
+            android:name="imgUrl"
+            app:argType="string" />
     </fragment>
 </navigation>
