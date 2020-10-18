@@ -59,7 +59,7 @@ class AddGuestFragment : Fragment() {
                 val name=binding.newName.text.toString()
                 val address=binding.newAddress.text.toString()
                 val email=binding.newMail.text.toString()
-                val phone:Int=binding.newPhone.text.toString().toIntOrNull()?:0
+                val phone:Long=binding.newPhone.text.toString().toLongOrNull()?:0
                 val comment=binding.newComment.text.toString()
 
                 if(name.isNotEmpty()&&address.isNotEmpty()&&email.isNotEmpty()
@@ -73,7 +73,7 @@ class AddGuestFragment : Fragment() {
                     }}
                        catch(e:Exception){Snackbar.make(it,"Failed to insert user '$name'.",MainActivity.DELAY).show()}
                     findNavController().popBackStack()
-                    Snackbar.make(it,"User $name successfully added.",MainActivity.DELAY).show()
+                    Snackbar.make(it,"User '$name' successfully added.",MainActivity.DELAY).show()
                 }else{
                 Snackbar.make(it,"Please fill in all the text fields to proceed.",MainActivity.DELAY).show() }
         }

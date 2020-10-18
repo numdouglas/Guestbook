@@ -9,7 +9,7 @@ data class Guest(
     val name:String,
     val address:String,
     @PrimaryKey
-    val phone:Int,
+    val phone:Long,
     val email:String,
     val comment:String,
     val picture: String
@@ -31,7 +31,7 @@ interface GuestDao{
     fun delete(guest:Guest)
 
     @Query("delete from Guest where phone = :phoneNo ")
-    fun deleteByPhoneNumber(phoneNo:Int):Int
+    fun deleteByPhoneNumber(phoneNo:Long):Int
 
 }
 

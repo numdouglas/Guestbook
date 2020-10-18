@@ -40,7 +40,7 @@
             app:argType="string" />
         <argument
             android:name="phone"
-            app:argType="integer" />
+            app:argType="long" />
         <argument
             android:name="email"
             app:argType="string" />
